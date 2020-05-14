@@ -6,7 +6,9 @@ import com.atguigu.gmall.bean.PmsBaseAttrValue;
 import com.atguigu.gmall.manage.mapper.PmsBaseAttrInfoMapper;
 import com.atguigu.gmall.manage.mapper.PmsBaseAttrValueMapper;
 import com.atguigu.gmall.service.AttrService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 
@@ -27,18 +29,36 @@ public class AttrServiceImpl implements AttrService {
 
     @Override
     public String saveAttrInfo(PmsBaseAttrInfo pmsBaseAttrInfo) {
-        pmsBaseAttrInfoMapper.insertSelective(pmsBaseAttrInfo);
-        List<PmsBaseAttrValue> attrValueList = pmsBaseAttrInfo.getAttrValueList();
-        for (PmsBaseAttrValue pmsBaseAttrValue : attrValueList) {
-            pmsBaseAttrValue.setAttrId(pmsBaseAttrInfo.getId());
-            pmsBaseAttrValueMapper.insertSelective(pmsBaseAttrValue);
+        String id = pmsBaseAttrInfo.getId();
+        if (StringUtils.isBlank(id)) {
+            pmsBaseAttrInfoMapper.insertSelective(pmsBaseAttrInfo);
+            List<PmsBaseAttrValue> attrValueList = pmsBaseAttrInfo.getAttrValueList();
+            for (PmsBaseAttrValue pmsBaseAttrValue : attrValueList) {
+                pmsBaseAttrValue.setAttrId(pmsBaseAttrInfo.getId());
+                pmsBaseAttrValueMapper.insertSelective(pmsBaseAttrValue);
+            }
+        } else {
+            //根据给定的example（where后的条件）更新有值的属性
+            Example example = new Example(PmsBaseAttrInfo.class);
+            example.createCriteria().andEqualTo("id", pmsBaseAttrInfo.getId());
+            pmsBaseAttrInfoMapper.updateByExampleSelective(pmsBaseAttrInfo, example);
+            //删除已存在的属性值
+            PmsBaseAttrValue oldPmsBaseAttrValue = new PmsBaseAttrValue();
+            oldPmsBaseAttrValue.setAttrId(pmsBaseAttrInfo.getId());
+            pmsBaseAttrValueMapper.delete(oldPmsBaseAttrValue);
+            //插入新的属性值
+            List<PmsBaseAttrValue> attrValueList = pmsBaseAttrInfo.getAttrValueList();
+            for (PmsBaseAttrValue pmsBaseAttrValue : attrValueList) {
+                pmsBaseAttrValue.setAttrId(pmsBaseAttrInfo.getId());
+                pmsBaseAttrValueMapper.insertSelective(pmsBaseAttrValue);
+            }
         }
         return "success";
     }
 
     @Override
     public List<PmsBaseAttrValue> getAttrValueList(String attrId) {
-        PmsBaseAttrValue pmsBaseAttrValue=new PmsBaseAttrValue();
+        PmsBaseAttrValue pmsBaseAttrValue = new PmsBaseAttrValue();
         pmsBaseAttrValue.setAttrId(attrId);
         List<PmsBaseAttrValue> list = pmsBaseAttrValueMapper.select(pmsBaseAttrValue);
         return list;
