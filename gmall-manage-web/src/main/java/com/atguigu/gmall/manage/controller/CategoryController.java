@@ -1,9 +1,7 @@
 package com.atguigu.gmall.manage.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.atguigu.gmall.bean.PmsBaseCatalog1;
-import com.atguigu.gmall.bean.PmsBaseCatalog2;
-import com.atguigu.gmall.bean.PmsBaseCatalog3;
+import com.atguigu.gmall.bean.*;
 import com.atguigu.gmall.service.CategoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -39,4 +37,13 @@ public class CategoryController {
         List<PmsBaseCatalog3> list = categoryService.getCatalog3(catalog2Id);
         return list;
     }
+
+    @RequestMapping("baseSaleAttrList")
+    @ResponseBody
+    public List<PmsBaseSaleAttr> baseSaleAttrList() {
+        List<PmsBaseSaleAttr> list = categoryService.baseSaleAttrList();
+        return list;
+    }
+
+
 }

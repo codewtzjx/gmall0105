@@ -1,8 +1,6 @@
 package com.atguigu.gmall.service;
 
-import com.atguigu.gmall.bean.PmsBaseCatalog1;
-import com.atguigu.gmall.bean.PmsBaseCatalog2;
-import com.atguigu.gmall.bean.PmsBaseCatalog3;
+import com.atguigu.gmall.bean.*;
 
 import java.util.List;
 
@@ -12,4 +10,6 @@ public interface CategoryService {
     List<PmsBaseCatalog2> getCatalog2(String catalog1Id);
 
     List<PmsBaseCatalog3> getCatalog3(String catalog2Id);
+
+    List<PmsBaseSaleAttr> baseSaleAttrList();
 }
